@@ -1,0 +1,43 @@
+extends layout
+
+block content
+  h1= title
+  h3 Personas conectadas
+  h4#personasConectadas 
+  ul#mensajes
+  div 
+    label Nombre 
+    input#inputUsuario(type="text")
+  div
+    label Mensaje 
+    input#inputMensaje(type="text") 
+    button#buttonEnviar Enviar
+
+
+  script(src="/socket.io/socket.io.js")
+  script.
+   const socket = io();
+
+   const inputUsuario = document.getElementById('inputUsuario');
+   const inputMensaje = document.getElementById('inputMensaje');
+   const buttonEnviar = document.getElementById('buttonEnviar');
+   const mensajes = document.getElementById('mensajes');
+   const personasConectadas = document.getElementById('personasConectadas');
+
+   buttonEnviar.addEventListener('click', () => {
+    socket.emit('mensaje_chat', {
+      usuario: inputUsuario.value,
+      mensaje: inputMensaje.value
+    });
+   });
+
+   socket.on('mensaje_chat', (data) => {
+    const li = document.createElement('li');
+    li.innerText = `${data.usuario} : ${data.mensaje}`;
+    mensajes.appendChild(li);
+   });
+
+   socket.on('personas', (total) => {
+    personasConectadas.innerText = total;
+   });
+
